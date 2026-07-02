@@ -1,0 +1,2 @@
+bucket         = "yelb-tf-state-prod-96454"
+dynamodb_table = "yelb-tf-locks-prod"
