@@ -21,12 +21,6 @@ locals {
 
 }
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
-data "aws_region" "current" {}
-
 resource "aws_vpc" "main" {
   cidr_block = var.vpc_cidr
   tags = {
@@ -132,14 +126,6 @@ resource "aws_route" "private_route" {
   nat_gateway_id         = aws_nat_gateway.main[0].id
 }
 
-resource "aws_route" "db_route" {
-  count = var.create_nat_gateway ? 1 : 0
-
-  route_table_id         = aws_route_table.db_rt.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.main[0].id
-}
-
 resource "aws_route_table_association" "public_rta" {
   for_each = aws_subnet.public_subnet
 
@@ -186,7 +172,7 @@ resource "aws_vpc_endpoint_route_table_association" "s3_endpoint_db_rta" {
 }
 
 resource "aws_s3_bucket" "vpc_flow_logs_bucket" {
-  bucket = "${var.env}-vpc-flow-logs-bucket-${data.aws_caller_identity.current.account_id}"
+  bucket        = "${var.env}-vpc-flow-logs-bucket-${data.aws_caller_identity.current.account_id}"
   force_destroy = true
 }
 
