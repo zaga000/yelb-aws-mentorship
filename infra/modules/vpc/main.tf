@@ -50,7 +50,7 @@ resource "aws_nat_gateway" "main" {
   count = var.create_nat_gateway ? 1 : 0
 
   allocation_id = aws_eip.nat_eip[0].id
-  subnet_id     = aws_subnet.public_subnet[0].id
+  subnet_id     = values(aws_subnet.public_subnet)[0].id
   tags = {
     Name = "${var.env}-nat-gateway"
   }

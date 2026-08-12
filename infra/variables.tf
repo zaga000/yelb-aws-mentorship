@@ -37,3 +37,55 @@ variable "db_subnet_count" {
   type        = number
   default     = 2
 }
+
+
+
+variable "db_port"{
+  type = number
+}
+
+
+
+variable "db_user" {
+  type = string
+}
+
+variable "db_password" {
+  type = string
+}
+
+variable "db_size" {
+  type = string
+}
+variable "cidr_block"{
+  type = string
+}
+variable "app_instance_type" {
+  type        = string
+  description = "EC2 instance type for app ASG"
+}
+
+variable "nat_eip"{
+  type = string
+  default = true
+}
+
+variable "app_ami_id" {
+  type        = string
+  description = "AMI ID for app instances"
+}
+
+variable "app_desired_capacity" {
+  type        = number
+  description = "Desired capacity for app ASG"
+}
+
+variable "app_max_size" {
+  type        = number
+  description = "Max size for app ASG"
+}
+
+variable "app_min_size" {
+  type        = number
+  description = "Min size for app ASG"
+}

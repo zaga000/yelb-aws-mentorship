@@ -4,7 +4,15 @@ variable "env" {
 }
 
 variable "cidr_block" {
-  type        = string
+  type        = list(string)
   description = "The CIDR block for the network"
-  default     = "0.0.0.0/0"
+  default     = ["0.0.0.0/0"]
+}
+
+variable "public_subnet_ids" {
+  type = list(string)
+}
+
+variable "vpc_id" {
+  type = string
 }
