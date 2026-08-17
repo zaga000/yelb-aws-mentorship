@@ -1,23 +1,15 @@
-variable "env" {
-  description = "Environment name (e.g., dev, prod)"
-  type        = string
-}
-variable "region" {
-  description = "AWS Region"
-  type        = string
-  default     = "us-east-1"
-}
 variable "vpc_cidr" {
   description = "CIDR block for VPC"
   type        = string
 }
-variable "instance_size" {
-  description = "EC2 instance size"
+
+variable "env" {
+  description = "Environment name (e.g., dev, prod)"
   type        = string
 }
 
 variable "create_nat_gateway" {
-  description = "Wheter to create a NAT Gateway"
+  description = "Whether to create a NAT Gateway"
   type        = bool
   default     = false
 }
@@ -27,11 +19,13 @@ variable "public_subnet_count" {
   type        = number
   default     = 2
 }
+
 variable "private_subnet_count" {
   description = "Number of private subnets to create"
   type        = number
   default     = 2
 }
+
 variable "db_subnet_count" {
   description = "Number of db subnets to create"
   type        = number
