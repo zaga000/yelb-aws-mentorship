@@ -13,3 +13,8 @@ output "public_subnet_ids" {
 output "private_subnet_ids" {
   value = [for subnet in aws_subnet.private_subnet : subnet.id]
 }
+
+output "flow_logs_bucket_name" {
+  description = "S3 bucket used for VPC flow logs and load test results"
+  value       = aws_s3_bucket.vpc_flow_logs_bucket.bucket
+}
