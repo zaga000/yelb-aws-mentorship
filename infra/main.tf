@@ -10,15 +10,15 @@ module "vpc" {
 }
 
 module "rds" {
-  source                = "./modules/rds"
-  env                   = var.env
-  vpc_id                = module.vpc.vpc_id
-  db_subnet_ids         = module.vpc.db_subnet_ids
-  app_security_group_id = module.asg.app_security_group_id
-  db_user               = var.db_user
-  db_password           = var.db_password
-  db_size               = var.db_size
-  db_port = var.db_port
+  source                     = "./modules/rds"
+  env                        = var.env
+  vpc_id                     = module.vpc.vpc_id
+  db_subnet_ids              = module.vpc.db_subnet_ids
+  app_security_group_id      = module.asg.app_security_group_id
+  db_user                    = var.db_user
+  db_password                = var.db_password
+  db_size                    = var.db_size
+  db_port                    = var.db_port
   allowed_security_group_ids = [module.asg.app_security_group_id]
 }
 
@@ -46,4 +46,26 @@ module "alb" {
 
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
+}
+
+module "observability" {
+  source = "./modules/observability"
+
+  env                     = var.env
+  alb_arn_suffix          = module.alb.alb_arn_suffix
+  target_group_arn_suffix = module.alb.target_group_arn_suffix
+  asg_name                = module.asg.asg_name
+}
+
+module "locust" {
+  source = "./modules/locust"
+
+  env                  = var.env
+  vpc_id               = module.vpc.vpc_id
+  public_subnet_id     = module.vpc.public_subnet_ids[0]
+  locust_ami_id        = var.app_ami_id
+  locust_instance_type = "t3.micro"
+  alb_url              = "http://${module.alb.alb_dns_name}"
+  locust_allowed_cidr  = var.locust_allowed_cidr
+  results_bucket       = module.vpc.flow_logs_bucket_name
 }

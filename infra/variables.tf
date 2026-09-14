@@ -38,13 +38,9 @@ variable "db_subnet_count" {
   default     = 2
 }
 
-
-
-variable "db_port"{
+variable "db_port" {
   type = number
 }
-
-
 
 variable "db_user" {
   type = string
@@ -57,7 +53,7 @@ variable "db_password" {
 variable "db_size" {
   type = string
 }
-variable "cidr_block"{
+variable "cidr_block" {
   type = string
 }
 variable "app_instance_type" {
@@ -65,8 +61,8 @@ variable "app_instance_type" {
   description = "EC2 instance type for app ASG"
 }
 
-variable "nat_eip"{
-  type = string
+variable "nat_eip" {
+  type    = string
   default = true
 }
 
@@ -88,4 +84,9 @@ variable "app_max_size" {
 variable "app_min_size" {
   type        = number
   description = "Min size for app ASG"
+}
+
+variable "locust_allowed_cidr" {
+  type        = string
+  description = "CIDR allowed to reach the Locust web UI (typically your own IP /32)"
 }

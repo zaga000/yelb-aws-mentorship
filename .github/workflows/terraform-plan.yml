@@ -1,0 +1,68 @@
+name: Terraform Plan (PR)
+
+on:
+  pull_request:
+    branches:
+        - main
+    paths:
+        - 'infra/**'
+    
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    environment: dev
+    defaults:
+      run: 
+        working-directory: ./infra
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.ROLE_ARN }}
+          aws-region: us-east-1
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -backend-config=env/dev.s3.tfbackend > init.log 2>&1
+      
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate > validate.log 2>&1
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set -o pipefail
+          terraform plan -var-file=env/dev.tfvars -out=tfplan -no-color | tee plan.log 
+
+      - name: Generate Plan Comment
+        id: plan-comment
+        run: |
+          export INIT_OUT=$(cat init.log)
+          export VALIDATE_OUT=$(cat validate.log)
+          export PLAN_OUT=$(cat plan.log)
+
+          envsubst '$INIT_OUT $VALIDATE_OUT $PLAN_OUT' < .github/tf-template.md > final_comment.md
+          
+      - name: Add PR Comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body-file final_comment.md
+          
+
+        
