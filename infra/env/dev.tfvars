@@ -13,3 +13,4 @@ app_min_size         = 2
 db_size              = "db.t3.micro"
 cidr_block           = "0.0.0.0/0"
 create_nat_gateway   = true
+locust_allowed_cidr  = "194.44.131.113/32"

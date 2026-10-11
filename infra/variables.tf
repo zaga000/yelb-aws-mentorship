@@ -85,3 +85,8 @@ variable "app_min_size" {
   type        = number
   description = "Min size for app ASG"
 }
+
+variable "locust_allowed_cidr" {
+  type        = string
+  description = "CIDR allowed to reach the Locust web UI (typically your own IP /32)"
+}

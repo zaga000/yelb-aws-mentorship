@@ -56,3 +56,16 @@ module "observability" {
   target_group_arn_suffix = module.alb.target_group_arn_suffix
   asg_name                = module.asg.asg_name
 }
+
+module "locust" {
+  source = "./modules/locust"
+
+  env                  = var.env
+  vpc_id               = module.vpc.vpc_id
+  public_subnet_id     = module.vpc.public_subnet_ids[0]
+  locust_ami_id        = var.app_ami_id
+  locust_instance_type = "t3.micro"
+  alb_url              = "http://${module.alb.alb_dns_name}"
+  locust_allowed_cidr  = var.locust_allowed_cidr
+  results_bucket       = module.vpc.flow_logs_bucket_name
+}
