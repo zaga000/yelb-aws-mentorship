@@ -5,3 +5,7 @@ output "website_url" {
 output "locust_web_ui" {
   value = module.locust.locust_web_ui_url
 }
+
+output "ecr_repo_urls" {
+  value = module.ecr.repo_urls
+}
