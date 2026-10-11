@@ -1,0 +1,43 @@
+name:  Terraform Deploy (Prod)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: prod
+    defaults:
+      run: 
+        working-directory: ./infra
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.ROLE_ARN }}
+          aws-region: us-east-1
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -backend-config=env/prod.s3.tfbackend 
+      
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan -var-file=env/prod.tfvars -out=tfplan -no-color
+          
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve tfplan
