@@ -69,3 +69,7 @@ module "locust" {
   locust_allowed_cidr  = var.locust_allowed_cidr
   results_bucket       = module.vpc.flow_logs_bucket_name
 }
+
+module "ecr" {
+  source = "./modules/ecr"
+}
