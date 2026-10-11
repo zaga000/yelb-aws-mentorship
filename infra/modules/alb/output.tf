@@ -17,3 +17,11 @@ output "alb_dns_name" {
   description = "The DNS name of the load balancer (Your website URL!)"
   value       = aws_lb.app_alb.dns_name
 }
+
+output "alb_arn_suffix" {
+  value = aws_lb.app_alb.arn_suffix
+}
+
+output "target_group_arn_suffix" {
+  value = aws_lb_target_group.app_tg.arn_suffix
+}

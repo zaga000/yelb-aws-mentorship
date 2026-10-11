@@ -10,15 +10,15 @@ module "vpc" {
 }
 
 module "rds" {
-  source                = "./modules/rds"
-  env                   = var.env
-  vpc_id                = module.vpc.vpc_id
-  db_subnet_ids         = module.vpc.db_subnet_ids
-  app_security_group_id = module.asg.app_security_group_id
-  db_user               = var.db_user
-  db_password           = var.db_password
-  db_size               = var.db_size
-  db_port = var.db_port
+  source                     = "./modules/rds"
+  env                        = var.env
+  vpc_id                     = module.vpc.vpc_id
+  db_subnet_ids              = module.vpc.db_subnet_ids
+  app_security_group_id      = module.asg.app_security_group_id
+  db_user                    = var.db_user
+  db_password                = var.db_password
+  db_size                    = var.db_size
+  db_port                    = var.db_port
   allowed_security_group_ids = [module.asg.app_security_group_id]
 }
 
@@ -46,4 +46,13 @@ module "alb" {
 
   vpc_id            = module.vpc.vpc_id
   public_subnet_ids = module.vpc.public_subnet_ids
+}
+
+module "observability" {
+  source = "./modules/observability"
+
+  env                     = var.env
+  alb_arn_suffix          = module.alb.alb_arn_suffix
+  target_group_arn_suffix = module.alb.target_group_arn_suffix
+  asg_name                = module.asg.asg_name
 }

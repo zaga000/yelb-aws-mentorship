@@ -31,12 +31,13 @@ resource "aws_launch_template" "app" {
   vpc_security_group_ids = [aws_security_group.app_sg.id]
 
   iam_instance_profile {
-    arn = "arn:aws:iam::765835831922:instance-profile/Yelb-SSM-Rol"
+    arn = aws_iam_instance_profile.instance_profile_logs.arn
   }
 
   user_data = base64encode(templatefile("${path.module}/user_data.sh", {
     rds_endpoint = var.rds_endpoint
     db_password  = var.db_password
+    env          = var.env
 
   }))
   tags = {
@@ -76,4 +77,39 @@ resource "aws_autoscaling_group" "app_asg" {
     propagate_at_launch = true
   }
 
+}
+resource "aws_iam_role_policy_attachment" "xray_write" {
+  role       = aws_iam_role.ec2_logs_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
+}
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "ec2_logs_role" {
+  name               = "${var.env}-ec2-logs-role"
+  path               = "/"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent" {
+  role       = aws_iam_role.ec2_logs_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_managed" {
+  role       = aws_iam_role.ec2_logs_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+resource "aws_iam_instance_profile" "instance_profile_logs" {
+  name = "${var.env}-instance-profile-logs"
+  role = aws_iam_role.ec2_logs_role.name
 }
