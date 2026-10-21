@@ -24,7 +24,7 @@ resource "aws_security_group_rule" "app_egress" {
 }
 
 resource "aws_launch_template" "app" {
-  name_prefix   = "${var.env}-app-launch-template-"
+  name_prefix   = "${var.env}-app-launch-template"
   image_id      = var.app_ami_id
   instance_type = var.app_instance_type
 

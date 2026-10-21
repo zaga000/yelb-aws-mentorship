@@ -43,6 +43,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 }
 
 resource "aws_db_instance" "db_instance" {
+  db_name           = "yelbdatabase"
   identifier        = "${var.env}-db-instance"
   allocated_storage = 20
   engine            = "postgres"

@@ -39,10 +39,11 @@ resource "aws_lb" "app_alb" {
 }
 
 resource "aws_lb_target_group" "app_tg" {
-  name     = "${var.env}-app-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name        = "${var.env}-ui-tg"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
 
   health_check {
     path                = "/"
@@ -51,6 +52,10 @@ resource "aws_lb_target_group" "app_tg" {
     healthy_threshold   = 5
     unhealthy_threshold = 2
     matcher             = "200-399"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

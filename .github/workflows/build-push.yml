@@ -1,23 +1,25 @@
-name:  Terraform Deploy (Dev)
+name: Build & Push Images (Dev)
 
 on:
   push:
     branches:
-        - main
+      - main
     paths:
-        - 'app/**'
+      - 'app/**'
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-push:
     runs-on: ubuntu-latest
     environment: dev
-    defaults:
-      run: 
-        working-directory: ./infra
     permissions:
       contents: read
       id-token: write
-    
+
+    strategy:
+      matrix:
+        service: [yelb-ui, yelb-appserver]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,19 +29,17 @@ jobs:
         with:
           role-to-assume: ${{ vars.ROLE_ARN }}
           aws-region: us-east-1
-      
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-        id: init
-        run: terraform init -backend-config=env/dev.s3.tfbackend 
-      
-      - name: Terraform Plan
-        id: plan
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set short SHA tag
+        run: echo "TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      - name: Build and push ${{ matrix.service }}
         run: |
-          terraform plan -var-file=env/dev.tfvars -out=tfplan -no-color
-          
-      - name: Terraform Apply
-        run: |
-          terraform apply -auto-approve tfplan
+          IMAGE="${{ steps.ecr.outputs.registry }}/${{ matrix.service }}:${TAG}"
+          docker build -t "$IMAGE" "app/${{ matrix.service }}"
+          docker push "$IMAGE"
+          echo "Pushed $IMAGE"

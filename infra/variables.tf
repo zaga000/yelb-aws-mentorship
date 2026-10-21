@@ -90,3 +90,13 @@ variable "locust_allowed_cidr" {
   type        = string
   description = "CIDR allowed to reach the Locust web UI (typically your own IP /32)"
 }
+
+variable "appserver_image_tag" {
+  type        = string
+  description = "Image tag for the appserver container"
+}
+
+variable "ui_image_tag" {
+  type        = string
+  description = "Image tag for the UI container"
+}

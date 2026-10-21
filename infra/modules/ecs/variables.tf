@@ -17,3 +17,41 @@ variable "ingress_internal_ports" {
   type        = list(number)
   default     = []
 }
+
+variable "vpc_id" {
+  description = "VPC ID where the security group will be created"
+  type        = string
+}
+
+variable "app_instance_type" {
+  description = "Instance type for the ECS tasks"
+  type        = string
+}
+
+variable "app_desired_capacity" {
+  description = "Desired capacity for the ECS tasks"
+  type        = number
+}
+
+variable "app_max_size" {
+  description = "Maximum size for the ECS tasks"
+  type        = number
+}
+variable "app_min_size" {
+  description = "Minimum size for the ECS tasks"
+  type        = number
+}
+variable "app_subnet_ids" {
+  description = "List of subnet IDs for the ECS tasks"
+  type        = list(string)
+}
+
+variable "autoscaling" {
+  description = "Service autoscaling settings; null disables autoscaling"
+  type = object({
+    min        = number
+    max        = number
+    cpu_target = number
+  })
+  default = null
+}
